@@ -25,18 +25,23 @@
             --edge-blur: 8px;
             --edge-height: 20px;
 
-            --radius-sm: 4px;
-            --radius-md: 6px;
-            --radius-lg: 8px;
-            --radius-full: 50%;
-            
+            --radius-sm: 4px;  /* Small elements (buttons, inputs) */
+            --radius-md: 6px;  /* Cards, containers */
+            --radius-lg: 8px;  /* Large containers, modals */
+            --radius-full: 50%; /* Circular elements */
+
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
             --overlay-start: rgba(26, 26, 46, 0.85);
             --overlay-end: rgba(13, 17, 23, 0.92);
         }
 
+        *{
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace !important;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--github-darker);
+            background: radial-gradient(var(--github-darker) 60%, var(--github-dark) 100%);
             color: white;
             padding-top: 80px;
             min-height: 100vh;
