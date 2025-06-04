@@ -93,9 +93,22 @@
             object-fit: contain;
         }
 
-        .form-control, .form-control:focus, .input-group-text {
-            background-color: var(--github-lighter);
-            color: var(--github-darker);
+        #github-form-container .form-control, 
+        #github-form-container .form-control:focus {
+        background-color: white;
+        color: black;
+        border: 1px solid var(--github-darker);
+        }
+
+        #github-form-container .input-group-text {
+        background-color: var(--github-dark);
+        color: white;
+        border: 1px solid var(--github-darker);
+        border-right: none;
+        }
+
+        #github-form-container .form-control {
+        transition: all 0.2s ease;
         }
 
         :root {
@@ -169,7 +182,7 @@
                     </div>
                 </div>
                 
-                <div class="card shadow">
+                <div class="card shadow"  id="github-form-container">
                     <div class="card-body">
                         <form id="profileForm">
                             <div class="mb-3">
