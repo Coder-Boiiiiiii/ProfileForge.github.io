@@ -13,6 +13,86 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
     <style>
+        canvas {
+            z-index: -1 !important;
+        }
+
+        /* Custom navbar styles */
+        .navbar {
+            min-height: 80px;
+            background-color: rgba(0,0,0, 0.1) !important;
+            backdrop-filter: blur(var(--navbar-blur));
+            -webkit-backdrop-filter: blur(var(--navbar-blur));
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            padding: 1rem 0;
+        }
+
+        .navbar-after {
+            height: var(--edge-height);
+            filter: blur(var(--edge-blur));
+            background: linear-gradient(
+                to bottom, 
+                rgba(45, 186, 78, 0.4),
+                transparent
+            );
+        }
+
+        .card{
+            background: linear-gradient(135deg, var(--github-light) 0%, var(--github-lighter) 100%);
+
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--github-darker);
+            opacity: 1;
+            z-index: -5;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(var(--github-darker) 60%, var(--github-dark) 100%);
+            opacity: 0.50; /* Reduced opacity for better visibility of noise */
+            z-index: -4;
+        }
+
+        body {
+            position: relative;
+            padding-top: 80px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+        }
+
+        canvas {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: -3 !important; /* Behind pseudo-elements */
+        }
+
+        #res-canvas {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
         :root {
             --github-dark: #1a1a2e;
             --github-darker: #0d1117;
@@ -40,59 +120,6 @@
             font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace !important;
         }
 
-        body {
-            background: radial-gradient(var(--github-darker) 60%, var(--github-dark) 100%);
-            color: white;
-            padding-top: 80px;
-            min-height: 100vh;
-            position: relative;
-        }
-
-        canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-        }
-
-        .navbar {
-            min-height: 80px;
-            background-color: rgba(0,0,0, 0.1) !important;
-            backdrop-filter: blur(var(--navbar-blur));
-            -webkit-backdrop-filter: blur(var(--navbar-blur));
-        }
-
-        .navbar-brand {
-            font-size: 1.5rem;
-            padding: 1rem 0;
-        }
-
-        .navbar-after {
-            height: var(--edge-height);
-            filter: blur(var(--edge-blur));
-            background: linear-gradient(
-                to bottom, 
-                rgba(45, 186, 78, 0.4),
-                transparent
-            );
-        }
-
-        .card {
-            background: linear-gradient(135deg, var(--github-light) 0%, var(--github-lighter) 100%);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            border: none;
-        }
-
-        .text-green {
-            color: var(--github-green);
-        }
-
-        .hover-green:hover {
-            color: var(--github-green) !important;
-        }
     </style>
 </head>
 
