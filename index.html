@@ -93,6 +93,11 @@
             object-fit: contain;
         }
 
+        .form-control, .form-control:focus, .input-group-text {
+            background-color: var(--github-lighter);
+            color: var(--github-darker);
+        }
+
         :root {
             --github-dark: #1a1a2e;
             --github-darker: #0d1117;
@@ -176,7 +181,7 @@
                                     placeholder="Enter GitHub username"
                                     oninput="updateUrlPreview()">
                             </div>
-                            <button type="submit" class="btn btn-lg btn-dark w-100">
+                            <button type="submit" class="btn btn-lg btn-dark w-100 mb-1">
                                 Generate Resume
                             </button>
                         </form>
