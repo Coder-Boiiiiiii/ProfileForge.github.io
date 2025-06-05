@@ -12,6 +12,8 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
+    <script src="scripts/resume.js" defer></script>
+    
     <style>
         canvas {
             z-index: -1 !important;
@@ -93,22 +95,37 @@
             object-fit: contain;
         }
 
+        #profile-image{
+            border-radius: 50%;
+            height: 200px;
+            width: 200px;
+            box-shadow: 0px 0px 25px 10px var(--github-darkest);
+        }
+
+        #smaller-stats{
+            opacity: 0.5;
+        }
+
+        .stats-grid{
+            display: grid;
+        }
+
         #github-form-container .form-control, 
         #github-form-container .form-control:focus {
-        background-color: white;
-        color: black;
-        border: 1px solid var(--github-darker);
+            background-color: white;
+            color: black;
+            border: 1px solid var(--github-darker);
         }
 
         #github-form-container .input-group-text {
-        background-color: var(--github-dark);
-        color: white;
-        border: 1px solid var(--github-darker);
-        border-right: none;
+            background-color: var(--github-dark);
+            color: white;
+            border: 1px solid var(--github-darker);
+            border-right: none;
         }
 
         #github-form-container .form-control {
-        transition: all 0.2s ease;
+            transition: all 0.2s ease;
         }
 
         :root {
@@ -145,7 +162,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand text-white fw-bold" href="#">
+            <a class="navbar-brand text-white fw-bold" href="index.html">
                 <i class="bi bi-github me-2"></i>
                 ProfileForge
             </a>
@@ -160,44 +177,53 @@
 
     <!-- Main Content -->
     <div class="container mt-5 pt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6 text-center text-white">
-                <h1 class="pb-2">Welcome to ProfileForge!</h1>
+        <div class="profile-header container text-center">
+            <div class="mt-2 pt-4"></div>
+            <img id="profile-image" class="avatar" alt="avatar" src="">
+            
+            <div class="profile-info text-white pt-4">
+                <h1 id="profile-name">Loading...</h1>
+                
+                <div class="stats-grid">
+                    <div class = "row">
+                        <div class = "col text-end">
+                            <p>
+                                Followers: <span id="profile-followers"></span>
+                            </p>
+                        </div>
 
-                <p class="pb-4" style="opacity: 0.5; font-size: 0.875rem;">Type in your Github username as it shows in the URL bar to generate your portfolio!</p>
+                        <div class="col-auto px-1">  <!-- Separator column -->
+                            <p class="mb-0 opacity-50">|</p>  <!-- Reduced opacity -->
+                        </div>
+                        
+                        <div class = "col text-start ">
+                            <p>
+                                Following: <span id="profile-following">0</span></p>
+                            </p>
+                        </div>
+                        
+                    </div>
 
-                <div class="mb-3">
-                    <div class="mt-2 text-start">
-                        <div class="input-group">
-                        <span class="input-group-text bg-dark text-white border-secondary">
-                            https://github.com/
-                        </span>
-                        <input 
-                            type="text" 
-                            class="form-control bg-dark text-white border-secondary" 
-                            id="urlPreview" 
-                            readonly
-                            value="yourusername">
+                    <div class="row" id="smaller-stats">
+                        <div class = "col text-end">
+                            <p>
+                                &#11088 <span id="profile-stars">0</span> Stars
+                            </p>
+                        </div>
+                        
+                        <div class="col-auto px-1">  <!-- Separator column -->
+                            <p class="mb-0">|</p>  <!-- Reduced opacity -->
+                        </div>
+
+                        <div class = "col text-start ">
+                            <p>
+                                &#128451 <span id="profile-repos">0</span> Repos
+                            </p>
                         </div>
                     </div>
-                </div>
-                
-                <div class="card shadow"  id="github-form-container">
-                    <div class="card-body">
-                        <form id="profileForm">
-                            <div class="mb-3">
-                                <input 
-                                    type="text" 
-                                    class="form-control form-control-lg" 
-                                    name="username" 
-                                    id="usernameInput"
-                                    placeholder="Enter GitHub username"
-                                    oninput="updateUrlPreview()">
-                            </div>
-                            <button type="submit" class="btn btn-lg btn-dark w-100 mb-1">
-                                Generate Resume
-                            </button>
-                        </form>
+                    
+                    <div class="row" id="smaller-stats">
+                        <p>Date Joined: <span id="profile-joined">Loading...</span></p>
                     </div>
                 </div>
             </div>
