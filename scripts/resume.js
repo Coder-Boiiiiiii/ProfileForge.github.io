@@ -14,18 +14,19 @@ async function fetchProfile(username) {
     try {
         const [userResponse, reposResponse] = await Promise.all([
             fetch(`https://api.github.com/users/${username}`),
-            fetch(`https://api.github.com/users/${username}/repos?sort=stars&per_page=6`)
+            fetch(`https://api.github.com/users/${username}/repos?sort=stars`) // GitHub's built-in sort
         ]);
         
-        if (!userResponse.ok || !reposResponse.ok) throw new Error("Data not found");
-        
-        const userData = await userResponse.json();
         const reposData = await reposResponse.json();
+        const sortedRepos = [...reposData].sort((a, b) => b.stargazers_count - a.stargazers_count);
         
-        return { userData, reposData };
+        return {
+            userData: await userResponse.json(),
+            reposData: sortedRepos // Pre-sorted
+        };
     }
     catch(error) {
-        console.error("Fetch Error: ", error);
+        console.error("Fetch Error:", error);
         return null;
     }
 }
@@ -72,7 +73,7 @@ function formatGitDate(dateString) {
 
 function renderRepoCards(repos) {
     const container = document.getElementById('repo-cards');
-    const sortedRepos = [...repos].sort((a, b) => b.stargazers_count - a.stargazers_count);
+    const sortedRepos = [...repos].sort((a, b) => b.stargazers_count - a.stargazers_count).slice(0, 6);
 
     if (!container) return;
 
