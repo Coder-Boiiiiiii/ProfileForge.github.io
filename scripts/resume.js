@@ -63,6 +63,8 @@ function updateProfileCard(data) {
 
     // Display repository cards
     renderRepoCards(reposData);
+
+    generateChart(reposData);    
 }
 
 function formatGitDate(dateString) {
@@ -135,9 +137,10 @@ async function getLanguages(language_url) {
             const percent = (bytes / total) * 100;
             const color = getColor(language);
             const text_color = darkenColor(color, 75);
+            const tooltipText = `${language} : ${Math.round(percent)}%`
 
             const bar = `
-                <div class="progress-bar" role="progressbar"
+                <div class="progress-bar" title = "${tooltipText}" role="progressbar"
                     style="width: ${percent}%; background-color: ${color}; color: ${text_color};"
                     aria-valuenow="${percent}" aria-valuemin="0" aria-valuemax="100">
                     ${language}
@@ -207,4 +210,74 @@ function darkenColor(hex, percent) {
 
     // Convert back to hex
     return `#${((newR << 16) | (newG << 8) | newB).toString(16).padStart(6, '0')}`;
+}
+
+function generateChart(reposData) {
+    const ctx = document.getElementById('pie');
+    if (!ctx) return;
+
+    // Filter out null/undefined languages
+    const languageArray = reposData.map(repo => repo.language).filter(Boolean);
+
+    // Count occurrences
+    const counts = languageArray.reduce((acc, lang) => {
+    acc[lang] = (acc[lang] || 0) + 1;
+    return acc;
+    }, {});
+
+    const total = languageArray.length;
+
+    // Prepare labels, data, and colors in the same order
+    const labels = Object.keys(counts);
+    const data = labels.map(lang => ((counts[lang] / total) * 100).toFixed(2));
+    const colors = labels.map(lang => getColor(lang));
+
+    // Destroy previous chart if it exists
+    if (window.pieChart) {
+        window.pieChart.destroy();
+    }
+
+    // Create new chart
+    window.pieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: labels,
+        datasets: [{
+        data: data,
+        backgroundColor: colors,
+        borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        font: {
+            family: 'Consolas'
+        },
+        plugins: {
+            legend: {
+                position: 'right',
+                labels: {
+                color: '#ffffff',
+                font: {
+                    size: 12,
+                }
+                }
+            },
+
+            tooltip: {
+                callbacks: {
+                label: function (context) {
+                    const label = context.label || '';
+                    const value = data[context.dataIndex];
+                    return `${label}: ${value}%`;
+                }
+                },
+                bodyColor: '#ffffff',
+                titleColor: '#ffffff',
+                backgroundColor: '#0d1117'
+            }
+        }
+    }
+    });
 }

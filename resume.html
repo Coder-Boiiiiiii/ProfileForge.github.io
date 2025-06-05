@@ -15,10 +15,16 @@
     <script src="scripts/resume.js" defer></script>
     <!-- YAML parser -->
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    <!-- Chart JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
     
     <style>
         canvas {
-            z-index: -1 !important;
+            z-index: -1 !important; /* Å© This is hiding your chart */
+            position: fixed !important; /* Å© This breaks chart layout */
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: -3 !important;
         }
 
         /* Custom navbar styles */
@@ -96,13 +102,18 @@
             min-height: 100vh;
         }
 
-        canvas {
-            position: fixed !important;
-            top: 0;
-            left: 0;
-            width: 100vw !important;
-            height: 100vh !important;
-            z-index: -3 !important; /* Behind pseudo-elements */
+        .lang-chart {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            aspect-ratio: 1; /* Ensures square shape */
+        }
+
+        #pie {
+            position: static !important; 
+            z-index: 1 !important;
+            width: 100% !important;
+            height: auto !important;
         }
 
         #res-canvas {
@@ -256,6 +267,13 @@
 
         <div id = "repo-cards" class = "row g-4">
 
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <h3 class="text-white mb-4">Language Distribution</h3>
+        <div class="lang-chart">
+            <canvas id="pie"></canvas>
         </div>
     </div>
 
