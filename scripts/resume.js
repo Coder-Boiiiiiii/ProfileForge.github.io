@@ -64,7 +64,11 @@ function updateProfileCard(data) {
     // Display repository cards
     renderRepoCards(reposData);
 
-    generateChart(reposData);    
+    // Generate language chart
+    generateChart(reposData); 
+    
+    // Language mastery levels
+    CalculateMasteryStats(reposData);
 }
 
 function formatGitDate(dateString) {
@@ -73,6 +77,95 @@ function formatGitDate(dateString) {
         month: "short",
         year: "numeric"
     }).format(date);
+}
+
+function CalculateMasteryStats(repoData){
+    const repoStats = [];
+    const repoScores = [];
+
+    repoData.forEach(repo => {
+        if(repo.language){
+            repoStats.push(
+                {
+                    language: repo.language,
+                    stars: repo.stargazers_count,
+                    last_update: repo.updated_at,
+                    size_kb: repo.size
+                }
+            )
+        }
+    });
+
+    repoStats.forEach(repo => {
+        let repoScore = 0.5;
+
+        // score based on stars (weighted)
+        const safeStars = repo.stars + 1; //to avoid log10(0)
+        const weighted_starScore = Math.log10(safeStars) * 0.2; 
+        repoScore += Math.min(weighted_starScore, 0.5);
+
+        // score based on last update (weighted)
+        const lastUpdate = new Date(repo.last_update);
+        const today = new Date();
+
+        const timeDiff = today - lastUpdate;
+        const daysSinceUpdate = timeDiff / (1000 * 3600 * 24);
+
+        repoScore += (Math.max(0, 1 - (daysSinceUpdate / 720)) * 0.2);
+
+        // score based on size
+        const sizeMB = repo.size_kb/1024;
+        if (sizeMB > 10) repoScore += 0.4;
+        else if (sizeMB > 5) repoScore += 0.2;
+        else if (sizeMB > 1) repoScore += 0.1;
+
+        repoScores.push(
+            {
+                language: repo.language,
+                score: repoScore
+            }
+        )
+    });
+
+    const aggregatedScores  = repoScores.reduce((acc, { language, score }) => {
+        acc[language] = (acc[language] || 0) + score;
+        return acc;
+        }, {});
+
+    const languageStats = Object.entries(aggregatedScores).map(([language, score]) => {
+        let level;
+        if (score >= 5) level = "Professional";
+        else if (score >= 2) level = "Proficient";
+        else level = "Novice";
+
+        return { language, score, level };
+    });
+
+    // Optional: Sort by score (highest first)
+    languageStats.sort((a, b) => b.score - a.score);
+
+    console.log(languageStats);
+    renderMasteryStats(languageStats);
+}
+
+function renderMasteryStats(langStats){
+    const container = document.getElementById('mastery-levels');
+
+    if(!container) return;
+
+    const level_code = 
+    `
+        <div class = "mb-3 text-white">
+            <span style = "color: {{COLOR}}"><strong>{{LANGUAGE}}:</strong></span> {{LEVEL}} ({{SCORE}})
+        </div>
+    `
+
+    container.innerHTML = langStats.map(stat => level_code
+        .replace('{{LANGUAGE}}', stat.language)
+        .replace('{{LEVEL}}', stat.level)
+        .replace('{{SCORE}}', Math.round(stat.score))
+        .replace('{{COLOR}}', getColor(stat.language))
+    ).join('');
 }
 
 async function renderRepoCards(repos) {
