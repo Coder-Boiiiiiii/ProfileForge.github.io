@@ -12,7 +12,7 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- Loader -->
-    <script src="scripts/resume.js" defer></script>
+    <script src="src/resume.js" defer></script>
     <!-- YAML parser -->
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
     <!-- Chart JS -->
@@ -159,6 +159,13 @@
             transition: all 0.2s ease;
         }
 
+        #loading-indicator {
+            transition: opacity 0.3s ease;
+        }
+        .loading-fade {
+            opacity: 0.5;
+        }
+
         :root {
             --github-dark: #1a1a2e;
             --github-darker: #0d1117;
@@ -266,7 +273,10 @@
         <h3 class = "text-white mb-4">Top Repositories <span class = "heading-caption">(Based on Star Count)</span></h3>
 
         <div id = "repo-cards" class = "row g-4">
-
+            <div id="loading-indicator" class="text-center py-5 d-none">
+                <div class="spinner-border text-primary"></div>
+                <p class="text-white mt-2">Crunching GitHub data...</p>
+            </div>
         </div>
     </div>
 
@@ -295,6 +305,10 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class = "container mt-5">
+        <div id = "disclaimer" class = "text-white mb-5 text-center"></div>
     </div>
 
     <!-- Canvas Background Script -->
@@ -410,38 +424,6 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
         draw();
-    </script>
-
-    <!-- Form Handling -->
-    <script>
-        function updateUrlPreview() {
-            const username = document.getElementById('usernameInput').value;
-            const preview = document.getElementById('urlPreview');
-            preview.value = username || 'yourusername';
-            
-            // GitHub-style validation
-            if (!username.match(/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i)) {
-                preview.classList.add('text-danger');
-                preview.classList.remove('text-white');
-            } else {
-                preview.classList.remove('text-danger');
-                preview.classList.add('text-white');
-            }
-        }
-
-        // Handle form submission
-        document.getElementById('profileForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const username = document.getElementById('usernameInput').value.trim();
-            
-            if (!username) {
-                alert('Please enter a GitHub username');
-                return;
-            }
-            
-            // Redirect to profile page with username as parameter
-            window.location.href = `resume.html?username=${encodeURIComponent(username)}`;
-        });
     </script>
 
     <!-- Bootstrap JS -->

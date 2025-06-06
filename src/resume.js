@@ -13,62 +13,78 @@ document.addEventListener("DOMContentLoaded", async function() {
 });
 
 async function fetchProfile(username) {
+    const usernameDisplay = document.getElementById("profile-name");
+    usernameDisplay.textContent = `Loading ${username}...`;
+    showLoading();
+
     try {
-        const [userResponse, reposResponse] = await Promise.all([
-            fetch(`https://api.github.com/users/${username}`),
-            fetch(`https://api.github.com/users/${username}/repos?sort=stars`) // GitHub's built-in sort
-        ]);
-        
-        const reposData = await reposResponse.json();
-        const sortedRepos = [...reposData].sort((a, b) => b.stargazers_count - a.stargazers_count);
-        
-        return {
-            userData: await userResponse.json(),
-            reposData: sortedRepos // Pre-sorted
-        };
+        const cleanUsername = username.trim();
+    if (!cleanUsername) throw new Error("Please enter a username");
+
+    const response = await fetch(`https://bold-wasp-97.deno.dev/?username=${encodeURIComponent(cleanUsername)}`);
+
+    const data = await response.json();
+
+    if (response.status === 404 || data?.message === "Not Found") {
+        throw new Error(`GitHub user "${cleanUsername}" not found`);
     }
-    catch(error) {
-        console.error("Fetch Error:", error);
-        return null;
+
+    if (!response.ok) {
+        throw new Error(data.message || `Error ${response.status}`);
+    }
+
+    updateProfileCard(data);
+    } catch (error) {
+        console.error("Error:", error);
+        document.getElementById("profile-name").textContent = error.message;
+        document.getElementById("profile-image").src = ""; // Clear old image
+    } finally {
+        hideLoading();
     }
 }
 
-function updateProfileCard(data) {
-    if (!data) {
-        document.getElementById("profile-name").textContent = "User not found";
-        return;
+async function updateProfileCard(data) {
+    showLoading(); 
+
+    try{
+        const { userData, reposData } = data;
+
+        // Update profile info
+        const updateField = (id, value) => {
+            const element = document.getElementById(id);
+            if (element) element.textContent = value;
+        };
+
+        // Basic profile info
+        if (document.getElementById("profile-image")) {
+            document.getElementById("profile-image").src = userData.avatar_url;
+        }
+        updateField("profile-name", userData.name || userData.login);
+        updateField("profile-following", userData.following);
+        updateField("profile-followers", userData.followers);
+        updateField("profile-repos", userData.public_repos);
+        updateField("profile-joined", formatGitDate(userData.created_at));
+        
+        // Calculate and display total stars
+        const totalStars = reposData.reduce((sum, repo) => sum + repo.stargazers_count, 0);
+        updateField("profile-stars", totalStars);
+
+        // Display repository cards
+        await renderRepoCards(reposData);
+
+        // Generate language chart
+        generateChart(reposData); 
+        
+        // Language mastery levels
+        CalculateMasteryStats(reposData);
+
+        // Show disclaimer
+        ShowDisclaimer(reposData.length);
     }
 
-    const { userData, reposData } = data;
-
-    // Update profile info
-    const updateField = (id, value) => {
-        const element = document.getElementById(id);
-        if (element) element.textContent = value;
-    };
-
-    // Basic profile info
-    if (document.getElementById("profile-image")) {
-        document.getElementById("profile-image").src = userData.avatar_url;
-    }
-    updateField("profile-name", userData.name || userData.login);
-    updateField("profile-following", userData.following);
-    updateField("profile-followers", userData.followers);
-    updateField("profile-repos", userData.public_repos);
-    updateField("profile-joined", formatGitDate(userData.created_at));
-    
-    // Calculate and display total stars
-    const totalStars = reposData.reduce((sum, repo) => sum + repo.stargazers_count, 0);
-    updateField("profile-stars", totalStars);
-
-    // Display repository cards
-    renderRepoCards(reposData);
-
-    // Generate language chart
-    generateChart(reposData); 
-    
-    // Language mastery levels
-    CalculateMasteryStats(reposData);
+    finally{
+        hideLoading();
+    }    
 }
 
 function formatGitDate(dateString) {
@@ -77,6 +93,12 @@ function formatGitDate(dateString) {
         month: "short",
         year: "numeric"
     }).format(date);
+}
+
+function ShowDisclaimer(repoCount){
+    if(repoCount >= 175){
+        document.getElementById("disclaimer").textContent = "Please note that this report is based on the top 200 repos of the user!";
+    }
 }
 
 function CalculateMasteryStats(repoData){
@@ -145,6 +167,7 @@ function CalculateMasteryStats(repoData){
     languageStats.sort((a, b) => b.score - a.score);
 
     console.log(languageStats);
+    console.log(repoStats);
     renderMasteryStats(languageStats);
 }
 
@@ -173,6 +196,9 @@ async function renderRepoCards(repos) {
     const sortedRepos = [...repos].sort((a, b) => b.stargazers_count - a.stargazers_count).slice(0, 6);
 
     if (!container) return;
+
+    // Reset opacity before rendering new cards
+    container.classList.remove('loading-fade');
 
     // Process all repos asynchronously
     const reposWithLanguages = await Promise.all(sortedRepos.map(async repo => {
@@ -373,4 +399,21 @@ function generateChart(reposData) {
         }
     }
     });
+}
+
+// Repo loading
+function showLoading() {
+  const loader = document.getElementById('loading-indicator');
+  if (loader) {
+    loader.classList.remove('d-none');
+    document.getElementById('repo-cards').classList.add('loading-fade');
+  }
+}
+
+function hideLoading() {
+  const loader = document.getElementById('loading-indicator');
+  if (loader) {
+    loader.classList.add('d-none');
+    document.getElementById('repo-cards').classList.remove('loading-fade');
+  }
 }
