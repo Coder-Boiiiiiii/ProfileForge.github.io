@@ -1,4 +1,4 @@
-# GitHub Profile Analyzer
+# Profile Forge
 A web app that analyzes GitHub profiles, visualizing repository statistics, language mastery, and contribution patterns with GitHub-inspired styling.
 
 ## ✨ Current Features
