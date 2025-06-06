@@ -22,6 +22,17 @@ A web app that analyzes GitHub profiles, visualizing repository statistics, lang
   - Real-time data fetching
   - GitHub Linguist color mapping
 
+## 🔮 Planned Features
+
+- **PDF Export**
+  - Export profile into a pleasant format.
+ 
+- **Badges**
+  - Trophy list similar to [github-profile-trophy](https://github-profile-trophy.vercel.app/)
+ 
+- **Repo Score**
+  - Per repo score rather than just language score (same logic).
+
 ## 🛠️ Tech Stack
 
 **Frontend**  
