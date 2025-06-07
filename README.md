@@ -29,9 +29,7 @@ A web app that analyzes GitHub profiles, visualizing repository statistics, lang
  
 - **Badges**
   - Trophy list similar to [github-profile-trophy](https://github-profile-trophy.vercel.app/)
- 
-- **Repo Score**
-  - Per repo score rather than just language score (same logic).
+  - Need to add more badges!
 
 ## 🛠️ Tech Stack
 
