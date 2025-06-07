@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- Loader -->
     <script src="src/resume.js" defer></script>
+    <script src = "src/badgeTiers.js"></script>
     <!-- YAML parser -->
     <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
     <!-- Chart JS -->
@@ -56,6 +57,15 @@
             overflow: hidden;
         }
 
+        #badges .badge{
+            background: linear-gradient(135deg, var(--github-light) 0%, var(--github-lighter) 100%);
+
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border-color: white;
+            box-shadow: 0px 0px 25px 2px var(--github-darkest);
+        }
+
         .hr-thick-light {
             height: 5px;
             background-color: var(--github-lighter);
@@ -68,6 +78,15 @@
         .heading-caption {
             font-size: 12px;
             opacity: 0.7;
+        }
+
+        .badge-caption {
+            font-size: 12px;
+            opacity: 0.7;
+            display: block;
+            text-overflow: ellipsis;
+            white-space: normal;
+            word-break: break-word;
         }
 
         body::before {
@@ -307,8 +326,13 @@
         </div>
     </div>
 
-    <div class = "container mt-5">
-        <div id = "disclaimer" class = "text-white mb-5 text-center"></div>
+    <div class = "container mt-5 mb-5">
+        <hr class="hr-thick-light">
+        <h3 class="text-white mb-4">User Badges</h3>
+
+        <div class="d-flex justify-content-center">
+            <div id = "badges" class = "row g-4 justify-content-center"></div>
+        </div>
     </div>
 
     <!-- Canvas Background Script -->

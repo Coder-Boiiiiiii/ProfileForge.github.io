@@ -13,33 +13,24 @@ document.addEventListener("DOMContentLoaded", async function() {
 });
 
 async function fetchProfile(username) {
-    const usernameDisplay = document.getElementById("profile-name");
-    usernameDisplay.textContent = `Loading ${username}...`;
-    showLoading();
-
     try {
-        const cleanUsername = username.trim();
-    if (!cleanUsername) throw new Error("Please enter a username");
-
-    const response = await fetch(`https://bold-wasp-97.deno.dev/?username=${encodeURIComponent(cleanUsername)}`);
-
-    const data = await response.json();
-
-    if (response.status === 404 || data?.message === "Not Found") {
-        throw new Error(`GitHub user "${cleanUsername}" not found`);
-    }
-
-    if (!response.ok) {
-        throw new Error(data.message || `Error ${response.status}`);
-    }
-
-    updateProfileCard(data);
+        // Try your API first
+        let response = await fetch(`https://bold-wasp-97.deno.dev/?username=${encodeURIComponent(username)}`);
+        
+        // If your API fails, fall back to GitHub's API
+        if (!response.ok) {
+            console.log("Falling back to GitHub API");
+            response = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`);
+            const userData = await response.json();
+            const reposResponse = await fetch(userData.repos_url);
+            const reposData = await reposResponse.json();
+            return { userData, reposData };
+        }
+        
+        return await response.json();
     } catch (error) {
-        console.error("Error:", error);
-        document.getElementById("profile-name").textContent = error.message;
-        document.getElementById("profile-image").src = ""; // Clear old image
-    } finally {
-        hideLoading();
+        console.error("Both APIs failed:", error);
+        throw error;
     }
 }
 
@@ -68,6 +59,7 @@ async function updateProfileCard(data) {
         // Calculate and display total stars
         const totalStars = reposData.reduce((sum, repo) => sum + repo.stargazers_count, 0);
         updateField("profile-stars", totalStars);
+        console.log(reposData);
 
         // Display repository cards
         await renderRepoCards(reposData);
@@ -78,8 +70,9 @@ async function updateProfileCard(data) {
         // Language mastery levels
         CalculateMasteryStats(reposData);
 
-        // Show disclaimer
-        ShowDisclaimer(reposData.length);
+        // Badges
+        const badges = getBadges(userData, reposData);
+        renderBadges(badges);
     }
 
     finally{
@@ -95,12 +88,43 @@ function formatGitDate(dateString) {
     }).format(date);
 }
 
-function ShowDisclaimer(repoCount){
-    if(repoCount >= 175){
-        document.getElementById("disclaimer").textContent = "Please note that this report is based on the top 200 repos of the user!";
-    }
+//Individual repo score
+function getRepoScore(repo){
+    let repoScore = 0.5;
+
+    // score based on stars (weighted)
+    const safeStars = repo.stargazers_count + 1; //to avoid log10(0)
+    const weighted_starScore = Math.log10(safeStars) * 0.2; 
+    repoScore += Math.min(weighted_starScore, 0.5);
+
+    // score based on last update (weighted)
+    const daysSinceUpdate = (new Date() - new Date(repo.updated_at)) / (86400000);
+
+    repoScore += (Math.max(0, 1 - (daysSinceUpdate / 720)) * 0.2);
+
+    // score based on size
+    const sizeMB = repo.size/1024;
+    if (sizeMB > 10) repoScore += 0.4;
+    else if (sizeMB > 5) repoScore += 0.2;
+    else if (sizeMB > 1) repoScore += 0.1;
+
+    return repoScore;
 }
 
+// Get repo score out of 10
+// Lenient since not every repo has to be big to be good.
+function NormalizeRepoScore(score){
+    const MIN_SCORE = 0.1;
+    const MAX_SCORE = 1.2;
+
+    const clamped = Math.min(Math.max(score, MIN_SCORE), MAX_SCORE);
+    const scaled = ((clamped - MIN_SCORE) / (MAX_SCORE - MIN_SCORE)) * 10;
+    const margin = scaled + 0.5; //Leniency
+
+    return Math.min(Math.round(margin * 10) / 10, 10);
+}
+
+// Calculate mastery levels
 function CalculateMasteryStats(repoData){
     const repoStats = [];
     const repoScores = [];
@@ -110,41 +134,19 @@ function CalculateMasteryStats(repoData){
             repoStats.push(
                 {
                     language: repo.language,
-                    stars: repo.stargazers_count,
-                    last_update: repo.updated_at,
-                    size_kb: repo.size
+                    stargazers_count: repo.stargazers_count,
+                    updated_at: repo.updated_at,
+                    size: repo.size
                 }
             )
         }
     });
 
     repoStats.forEach(repo => {
-        let repoScore = 0.5;
-
-        // score based on stars (weighted)
-        const safeStars = repo.stars + 1; //to avoid log10(0)
-        const weighted_starScore = Math.log10(safeStars) * 0.2; 
-        repoScore += Math.min(weighted_starScore, 0.5);
-
-        // score based on last update (weighted)
-        const lastUpdate = new Date(repo.last_update);
-        const today = new Date();
-
-        const timeDiff = today - lastUpdate;
-        const daysSinceUpdate = timeDiff / (1000 * 3600 * 24);
-
-        repoScore += (Math.max(0, 1 - (daysSinceUpdate / 720)) * 0.2);
-
-        // score based on size
-        const sizeMB = repo.size_kb/1024;
-        if (sizeMB > 10) repoScore += 0.4;
-        else if (sizeMB > 5) repoScore += 0.2;
-        else if (sizeMB > 1) repoScore += 0.1;
-
         repoScores.push(
             {
                 language: repo.language,
-                score: repoScore
+                score: getRepoScore(repo)
             }
         )
     });
@@ -217,6 +219,7 @@ async function renderRepoCards(repos) {
                     <div class = "row">
                         <div class = "col-md-9">
                             <h5 class="text-emphasis text-white"><strong>{{NAME}}</strong></h5>
+                            <p class="text-white" id="smaller-stats">Score: {{SCORE}}/10</p>
                         </div>
                         
                         <div class = "col-md-3" id="smaller-stats">
@@ -238,7 +241,38 @@ async function renderRepoCards(repos) {
         .replace('{{NAME}}', repo.name)
         .replace('{{STARS}}', repo.stargazers_count)
         .replace('{{BODY}}', repo.description || 'No description')
-        .replace('{{PROGRESS}}', repo.languagesBar)).join(''); // Use the pre-fetched languagesBar
+        .replace('{{PROGRESS}}', repo.languagesBar)
+        .replace('{{SCORE}}', NormalizeRepoScore(getRepoScore(repo)))
+    ).join(''); // Use the pre-fetched languagesBar
+}
+
+function renderBadges(badges){
+    const container = document.getElementById('badges');
+
+    if(!container) return;
+
+    const card_code = 
+    `
+        <div class="col-12 col-sm-6 col-md-4 d-flex justify-content-center">
+        <div class="badge p-3 d-flex flex-column justify-content-center align-items-center text-white" 
+            style="width: 200px; height: 200px;">
+                <div class="mb-2" style = "font-size: 80px">{{ICON}}</div>
+                <p class="mb-3" style = "font-size: 15px"><strong>{{TEXT}}</strong></p>
+                <p class="mb-1 badge-caption" style = "font-size: 12px;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                    padding: 0 8px;"><strong>{{INFO}}</strong></p>
+             </div>
+        </div>
+    `
+
+    container.innerHTML = badges.map(badges => card_code
+        .replace('{{ICON}}', badges.icon)
+        .replace('{{TEXT}}', badges.text)
+        .replace('{{INFO}}', badges.info)
+    ).join('');
 }
 
 async function getLanguages(language_url) {
