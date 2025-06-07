@@ -10,12 +10,17 @@ A web app that analyzes GitHub profiles, visualizing repository statistics, lang
 
 - **Repository Analysis**
   - Top 6 most-starred repos
+  - Repo scores (out of 10) for each repo (in top 6) based on size, star count, and last update.
   - Language distribution pie chart
   - Progress bars for language usage
 
 - **Skill Assessment**
   - Language mastery levels (Novice/Proficient/Professional)
   - Scores based on stars, activity, and repo size
+ 
+- **Badges**
+  - Badges based on last commit, total star count, repo star count, etc.
+  - Similar concept to github trophies.
 
 - **GitHub Integration**
   - Deno proxy for API calls
