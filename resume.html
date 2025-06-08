@@ -4,18 +4,18 @@
     <!-- META STUFF -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Beautiful GitHub profile resumes - Showcase your projects, skills, and contributions in one page">
+    <meta name="description" content="Turn your GitHub profile into a beautiful resume with stats, badges, and charts. Share your coding journey in one click!">
     
     <meta property="og:title" content="ProfileForge">
     <meta property="og:image" content="https://coder-boiiiiiii.github.io/profileforge.github.io/graphics/preview_card.jpg">
     <meta property="og:url" content="https://coder-boiiiiiii.github.io/profileforge.github.io">
     <meta property="og:type" content="website">
-    <meta name="og:description" content="Beautiful GitHub profile resumes - Showcase your projects, skills, and contributions in one page">
+    <meta name="og:description" content="Turn your GitHub profile into a beautiful resume with stats, badges, and charts. Share your coding journey in one click!">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://coder-boiiiiiii.github.io/profileforge.github.io/graphics/preview_card.jpg">
 
-    <title>ProfileForge</title>
+    <title>ProfileForge - GitHub Resume Generator</title>
     
     <!-- Preconnect to CDN for faster loading -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
@@ -83,6 +83,32 @@
             </div>
         </div>
     </nav>
+
+    <script>
+        const navbar = document.querySelector(".navbar");
+
+        function scrollFunction() {
+            if (window.scrollY > 20) {
+                navbar.classList.add("navbar-hidden");
+            } else {
+                navbar.classList.remove("navbar-hidden");
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            window.addEventListener('scroll', scrollFunction);
+        });
+    </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+
 
     <!-- Main Content -->
     <div class="container mt-5 pt-5">

@@ -254,10 +254,13 @@ function renderBadges(badges){
     const card_code = 
     `
         <div class="col-12 col-sm-6 col-md-4 d-flex justify-content-center">
-        <div class="badge p-3 d-flex flex-column justify-content-center align-items-center text-white" 
-            style="width: 200px; height: 200px;">
+        <div class="{{BADGE_TYPE}} p-3 d-flex flex-column justify-content-center align-items-center text-white" 
+            style="width: 200px; height: 250px;" 
+            data-bs-toggle="tooltip" 
+            data-bs-placement="bottom"
+            data-bs-title="{{TOOLTIP}}">
                 <div class="mb-2" style = "font-size: 80px">{{ICON}}</div>
-                <p class="mb-3" style = "font-size: 15px"><strong>{{TEXT}}</strong></p>
+                <p class="mb-1" style = "font-size: 15px"><strong>{{TEXT}}</strong></p>
                 <p class="mb-1 badge-caption" style = "font-size: 12px;
                     display: -webkit-box;
                     -webkit-line-clamp: 3;
@@ -272,7 +275,14 @@ function renderBadges(badges){
         .replace('{{ICON}}', badges.icon)
         .replace('{{TEXT}}', badges.text)
         .replace('{{INFO}}', badges.info)
+        .replace('{{BADGE_TYPE}}', badges.unicorn ? 'badge-unicorn' : 'badge')
+        .replace('{{TOOLTIP}}', badges.tooltip)
     ).join('');
+
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.forEach(function (el) {
+        new bootstrap.Tooltip(el);
+    });
 }
 
 async function getLanguages(language_url) {
