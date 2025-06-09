@@ -44,6 +44,8 @@ canvas {
     overflow: hidden;
 }
 
+/* Badge Styling */
+
 #badges .badge{
     background: linear-gradient(135deg, var(--github-light) 0%, var(--github-lighter) 100%);
 
@@ -52,6 +54,31 @@ canvas {
     border-color: white;
     box-shadow: 0px 0px 25px 2px var(--github-darkest);
 }
+
+.badge-emoji {
+  font-size: 80px;
+  line-height: 0.8;
+  display: block;
+  height: 80px;
+  margin-bottom: 0.5rem;
+}
+
+.badge-title {
+  font-size: 15px;
+  margin-bottom: 0.5rem !important;
+  line-height: 1.2;
+}
+
+.badge-caption {
+    font-size: 12px;
+    opacity: 0.7;
+    display: block;
+    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
+}
+
+/* Unicorn Badge Styling */
 
 .badge-unicorn {
     position: relative;
@@ -91,10 +118,12 @@ canvas {
     100% { filter: hue-rotate(360deg); }
 }
 
+/* Separator Styling */
+
 .hr-thick-light {
     height: 5px;
-    background-color: var(--github-lighter);
-    opacity: 1;
+    background-color: var(--github-lightest);
+    opacity: 0.5;
     margin: 1rem 0;
     border: none;
     border-radius : 10px;
@@ -105,13 +134,12 @@ canvas {
     opacity: 0.7;
 }
 
-.badge-caption {
-    font-size: 12px;
-    opacity: 0.7;
-    display: block;
-    text-overflow: ellipsis;
-    white-space: normal;
-    word-break: break-word;
+.cursor-pointer {
+    cursor: pointer;
+}
+
+[data-bs-toggle="collapse"]:hover {
+    background-color: var(--github-darker);
 }
 
 body::before {
@@ -208,4 +236,49 @@ body {
 }
 .loading-fade {
     opacity: 0.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--heading-font);
+    font-weight: 700;
+}
+
+body {
+    font-family: var(--body-font);
+    font-weight: 400;
+}
+
+body, 
+p, span, div, 
+ul, ol, li,
+table, tr, td, th,
+input, textarea, button {
+  font-family: var(--body-font);
+  font-weight: 400;
+}
+
+.wide-tooltip .tooltip-inner {
+  max-width: var(--wide-tooltip-width) !important;
+  width: var(--wide-tooltip-width) !important;
+  text-align: left;
+  padding: 0.75rem 1rem;
+}
+
+.medium-tooltip .tooltip-inner {
+  max-width: var(--medium-tooltip-width) !important;
+  width: var(--medium-tooltip-width) !important;
+  text-align: left;
+  padding: 0.75rem 1rem;
+}
+
+@media (max-width: 576px) {
+    .wide-tooltip .tooltip-inner {
+        max-width: 90vw !important;
+        width: auto !important;
+    }
+
+    .medium-tooltip .tooltip-inner {
+        max-width: 50vw !important;
+        width: auto !important;
+    }
 }

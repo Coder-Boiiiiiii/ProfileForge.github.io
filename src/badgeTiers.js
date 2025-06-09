@@ -141,7 +141,7 @@ function getBadges(userData, reposData){
             text: 'Architect',
             //class: 'badge-oss'
             info: "Have 50 or more public repos",
-            tooltip: "Warning: May contain submodule skyscrappers and monorepo magacities",
+            tooltip: "Warning: May contain submodule skyscrapers and monorepo megacities",
             unicorn: true
         });
     }
@@ -225,7 +225,7 @@ function getBadges(userData, reposData){
             text: 'Stellar',
             //class: 'badge-pop'
             info: "Have a repo with a stargazer count above 100",
-            tooltip: "Shining brighter than Neo-Tokyo in Akria"
+            tooltip: "Shining brighter than Neo-Tokyo in Akira"
         });
     }
     

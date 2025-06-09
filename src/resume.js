@@ -105,8 +105,10 @@ function getRepoScore(repo){
     // score based on size
     const sizeMB = repo.size/1024;
     if (sizeMB > 10) repoScore += 0.4;
-    else if (sizeMB > 5) repoScore += 0.2;
-    else if (sizeMB > 1) repoScore += 0.1;
+    else if (sizeMB > 7) repoScore += 0.3;
+    else if (sizeMB > 2) repoScore += 0.2;
+    else if (sizeMB > 0.5) repoScore += 0.1;
+    else repoScore += 0.05;
 
     return repoScore;
 }
@@ -259,8 +261,8 @@ function renderBadges(badges){
             data-bs-toggle="tooltip" 
             data-bs-placement="bottom"
             data-bs-title="{{TOOLTIP}}">
-                <div class="mb-2" style = "font-size: 80px">{{ICON}}</div>
-                <p class="mb-1" style = "font-size: 15px"><strong>{{TEXT}}</strong></p>
+                <div class="badge-emoji" style = "font-size: 80px">{{ICON}}</div>
+                <p class="badge-title" style = "font-size: 15px"><strong>{{TEXT}}</strong></p>
                 <p class="mb-1 badge-caption" style = "font-size: 12px;
                     display: -webkit-box;
                     -webkit-line-clamp: 3;

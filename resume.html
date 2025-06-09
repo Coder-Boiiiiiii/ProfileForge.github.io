@@ -15,6 +15,23 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="https://coder-boiiiiiii.github.io/profileforge.github.io/graphics/preview_card.jpg">
 
+    <!-- FAVICON -->
+   
+    <!-- Modern Browsers -->
+    <link rel="icon" href="src/favicons/favicon.ico" sizes="any"> <!-- Fallback -->
+    <link rel="icon" href="src/favicons/favicon-32x32.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="src/favicons/favicon-16x16.png" type="image/png" sizes="16x16">
+
+    <!-- Apple Devices -->
+    <link rel="apple-touch-icon" href="src/favicons/apple-touch-icon.png" sizes="180x180">
+
+    <!-- Android/Chrome -->
+    <link rel="icon" href="src/favicons/android-chrome-192x192.png" type="image/png" sizes="192x192">
+    <link rel="icon" href="src/favicons/android-chrome-512x512.png" type="image/png" sizes="512x512">
+
+    <!-- THEME -->
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+
     <title>ProfileForge - GitHub Resume Generator</title>
     
     <!-- Preconnect to CDN for faster loading -->
@@ -25,7 +42,7 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
     <!-- Loader -->
     <script src="src/resume.js" defer></script>
     <script src = "src/badgeTiers.js"></script>
@@ -42,7 +59,8 @@
             --github-darker: #0d1117;
             --github-darkest: #000000;
             --github-light: #181830;
-            --github-lighter: #101721;
+            --github-lighter: hsl(215, 35%, 10%);
+            --github-lightest: #223147;
             --github-green: #2dba4e;
 
             --navbar-blur: 5px;
@@ -54,16 +72,15 @@
             --radius-lg: 8px;  /* Large containers, modals */
             --radius-full: 50%; /* Circular elements */
 
-            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            --heading-font: 'Space Mono', monospace;
+            --body-font: 'Roboto Mono', monospace;
 
             --overlay-start: rgba(26, 26, 46, 0.85);
             --overlay-end: rgba(13, 17, 23, 0.92);
-        }
 
-        *{
-            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace !important;
+            --wide-tooltip-width: 400px;
+            --medium-tooltip-width: 250px;
         }
-
     </style>
 </head>
 
@@ -102,7 +119,7 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-custom-class]'));
             tooltipTriggerList.forEach(function (tooltipTriggerEl) {
             new bootstrap.Tooltip(tooltipTriggerEl);
             });
@@ -193,11 +210,59 @@
             <div class="col-lg col-md-5">
                 <div class="card h-auto" id = "card-base">
                     <div class="card-body" id = "card_body">
-                        <h3 class="text-white mb-4">Mastery Levels*</h3>
+                        <div class = "row">
+                            <div class="col-10 text-start">
+                                <h3 class="text-white mb-4">Mastery Levels</h3>
+                            </div>
+                            
+                            <div class = "col-2 text-end">
+                                <button 
+                                    class="btn btn-sm btn-outline-secondary rounded-circle text-white" 
+                                    style="width: 28px; height: 28px;"
+                                    data-bs-toggle="tooltip" 
+                                    data-bs-html="true"
+                                    data-bs-custom-class="medium-tooltip"
+                                    data-bs-title="
+                                    <h6><strong>Mastery Levels:</strong></h6>
+                                    <ol class = 'text-white'>
+                                        <li>Professional <span class = 'heading-caption'>(Highest)</span></li>
+                                        <li>Proficient</li>
+                                        <li>Novice <span class = 'heading-caption'>(Lowest)</span></li>
+                                    </ol>
+                                    ">
+                                    ?
+                                </button>
+                            </div>
+                        </div>
                     
                         <div id = "mastery-levels"></div>
 
-                        <div class = "text-white heading-caption">* These scores are based on repository count, star count, last update period, and file size.</div>
+                        <hr class="hr-thick-light">
+
+                        <div class="text-white">
+                            <div class="d-flex justify-content-between align-items-center mb-2 cursor-pointer"
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#masteryCalcCollapse"
+                                    aria-expanded="false" 
+                                    aria-controls="masteryCalcCollapse">
+                                <p class="mb-0"><strong>Mastery Level Calculation</strong></p>
+                                <span class="heading-caption">[show/hide]</span>
+                            </div>
+                            
+                            <!-- Collapsable Content -->
+                            <div class="collapse" id="masteryCalcCollapse">
+                                <div class='mb-2 small'>
+                                    <div class='d-flex justify-content-between'><strong>Base Score:</strong> <span>0.5 (fixed)</span></div>
+                                    <div class='d-flex justify-content-between'><strong>&#11088 Star Count:</strong> <span>0-0.5 (weighted)</span></div>
+                                    <div class='d-flex justify-content-between'><strong>&#128338 Last Update:</strong> <span>0-0.2 (weighted)</span></div>
+                                    <div class='d-flex justify-content-between'><strong>&#128230 Project Size:</strong> <span>0.05-0.4 (tiered)</span></div>
+                                </div>
+                                
+                                <div class='heading-caption'>
+                                    <strong>Total per repo:</strong> 0.5 (base) + 0.5 (stars) + 0.2 (freshness) + 0.4 (size) = 1.6 (Max) & 0.55 (Min)
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
