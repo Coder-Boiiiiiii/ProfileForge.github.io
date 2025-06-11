@@ -14,31 +14,55 @@ document.addEventListener("DOMContentLoaded", async function() {
 
 async function fetchProfile(username) {
     try {
-        // Try your API first
-        let response = await fetch(`https://bold-wasp-97.deno.dev/?username=${encodeURIComponent(username)}`);
-        
-        // If your API fails, fall back to GitHub's API
-        if (!response.ok) {
-            console.log("Falling back to GitHub API");
-            response = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`);
-            const userData = await response.json();
-            const reposResponse = await fetch(userData.repos_url);
-            const reposData = await reposResponse.json();
-            return { userData, reposData };
+        // Fetch all data in parallel
+        const [userResponse, reposResponse, orgsResponse] = await Promise.all([
+            fetch(`https://bold-wasp-97.deno.dev/?username=${encodeURIComponent(username)}`),
+            fetch(`https://bold-wasp-97.deno.dev/?username=${encodeURIComponent(username)}&query=repos`),
+            fetch(`https://bold-wasp-97.deno.dev/?username=${encodeURIComponent(username)}&query=orgs`)
+        ]);
+
+        // If any request fails, fall back to GitHub API
+        if (!userResponse.ok || !reposResponse.ok || !orgsResponse.ok) {
+            throw new Error("Proxy failed, falling back to GitHub API");
         }
-        
-        return await response.json();
-    } catch (error) {
-        console.error("Both APIs failed:", error);
-        throw error;
+
+        return {
+            userData: await userResponse.json(),
+            reposData: await reposResponse.json(),
+            orgsData: await orgsResponse.json()
+        };
+    } catch (proxyError) {
+        console.warn("Proxy failed, falling back to direct GitHub API:", proxyError);
+        try {
+            // Fallback to GitHub API
+            const [userResponse, reposResponse, orgsResponse] = await Promise.all([
+                fetch(`https://api.github.com/users/${encodeURIComponent(username)}`),
+                fetch(`https://api.github.com/users/${encodeURIComponent(username)}/repos?sort=stars`),
+                fetch(`https://api.github.com/users/${encodeURIComponent(username)}/orgs`)
+            ]);
+
+            if (!userResponse.ok || !reposResponse.ok) {
+                throw new Error("GitHub API requests failed");
+            }
+
+            return {
+                userData: await userResponse.json(),
+                reposData: await reposResponse.json(),
+                orgsData: await orgsResponse.ok ? await orgsResponse.json() : []
+            };
+        } catch (githubError) {
+            console.error("All data fetching methods failed:", githubError);
+            throw new Error("Could not fetch profile data");
+        }
     }
 }
 
-async function updateProfileCard(data) {
-    showLoading(); 
 
-    try{
-        const { userData, reposData } = data;
+async function updateProfileCard(data) {
+    showLoading();
+
+    try {
+        const { userData, reposData, orgsData = [] } = data;
 
         // Update profile info
         const updateField = (id, value) => {
@@ -49,7 +73,9 @@ async function updateProfileCard(data) {
         // Basic profile info
         if (document.getElementById("profile-image")) {
             document.getElementById("profile-image").src = userData.avatar_url;
+            document.getElementById("profile-image").alt = `${userData.login}'s avatar`;
         }
+        
         updateField("profile-name", userData.name || userData.login);
         updateField("profile-following", userData.following);
         updateField("profile-followers", userData.followers);
@@ -59,10 +85,12 @@ async function updateProfileCard(data) {
         // Calculate and display total stars
         const totalStars = reposData.reduce((sum, repo) => sum + repo.stargazers_count, 0);
         updateField("profile-stars", totalStars);
-        console.log(reposData);
 
         // Display repository cards
         await renderRepoCards(reposData);
+
+        //Display org cards
+        renderOrgsCards(orgsData);
 
         // Generate language chart
         generateChart(reposData); 
@@ -70,14 +98,21 @@ async function updateProfileCard(data) {
         // Language mastery levels
         CalculateMasteryStats(reposData);
 
-        // Badges
-        const badges = getBadges(userData, reposData);
+        // Badges (now includes org-based badges)
+        const badges = getBadges(userData, reposData, orgsData);
         renderBadges(badges);
-    }
 
-    finally{
+        // Display organizations (if you have an orgs section)
+        if (typeof renderOrgs === 'function') {
+            renderOrgs(orgsData);
+        }
+
+    } catch (error) {
+        console.error("Error updating profile card:", error);
+        showError("Failed to load profile data");
+    } finally {
         hideLoading();
-    }    
+    }
 }
 
 function formatGitDate(dateString) {
@@ -246,6 +281,40 @@ async function renderRepoCards(repos) {
         .replace('{{PROGRESS}}', repo.languagesBar)
         .replace('{{SCORE}}', NormalizeRepoScore(getRepoScore(repo)))
     ).join(''); // Use the pre-fetched languagesBar
+}
+
+function renderOrgsCards(orgs) {
+    const container = document.getElementById('org-cards');
+    if (!container) return;
+
+    // Reset opacity before rendering new cards
+    container.classList.remove('loading-fade');
+
+    const card_code =
+    `
+        <div class="col-md-6 mb-4">
+            <div class="card repo-card h-100" id = "card-base">
+                <div class="card-body" id = "card_body">
+                    <div class = "row">
+                        <div class = "col-lg-2 col-md-3 d-flex justify-content-center align-items-center">
+                            <img id="org-image" class="avatar img-fluid" alt="Organization Logo" src={{IMG_SRC}}>
+                        </div>
+                        
+                        <div class = "col-lg-10 col-md-9">
+                            <h5 class="text-emphasis text-white"><strong>{{NAME}}</strong></h5>
+                            <p class = "text-white">{{BODY}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `
+    
+    container.innerHTML = orgs.map(org => card_code
+        .replace('{{NAME}}', org.login)
+        .replace('{{BODY}}', org.description || 'No description')
+        .replace('{{IMG_SRC}}', org.avatar_url)
+    ).join('');
 }
 
 function renderBadges(badges){
