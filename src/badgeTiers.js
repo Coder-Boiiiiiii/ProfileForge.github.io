@@ -1,5 +1,5 @@
 //Badges
-function getBadges(userData, reposData){    
+function getBadges(userData, reposData, orgsData){    
     const badges = [];
     const totalStars = reposData.reduce((sum, repo) => sum + repo.stargazers_count, 0);
 
@@ -9,6 +9,54 @@ function getBadges(userData, reposData){
     const mostRecentRepo = sortedRepos[0];
     const mostRecentDaysSinceUpdate = Math.floor((new Date() - new Date(mostRecentRepo.updated_at)) / (86400000));
     const readMeCount = reposData.filter(repo => repo.has_wiki || repo.description).length;
+
+    const orgCount = orgsData.length;
+
+    //Organization badges
+    if(orgCount >= 12){
+        badges.push(
+            {
+                icon: '&#129733',
+                text: 'Collab King',
+                info: "Contribute to 12 or more organizations.",
+                tooltip: "All hail the collab monarch ? your crown shines bright",
+                unicorn: true
+            }
+        )
+    }
+
+    else if(orgCount >= 8){
+        badges.push(
+            {
+                icon: '&#128376',
+                text: 'Webmaster',
+                info: "Contribute to 7 or more organizations.",
+                tooltip: "You&#39re the spider at the center of the web ? everyone&#39s connected to you!"
+            }
+        )
+    }
+
+    else if(orgCount >= 4){
+        badges.push(
+            {
+                icon: '&#129309',
+                text: 'Collaborator',
+                info: "Contribute to 4 or more organizations.",
+                tooltip: "Your name's in the credits of so many collabs ? you&#39re unstoppable!"
+            }
+        )
+    }
+
+    else if(orgCount >= 1){
+        badges.push(
+            {
+                icon: '&#128101',
+                text: 'Team Player',
+                info: "Contribute to 1 or more organizations.",
+                tooltip: "The glue that keeps the dream alive"
+            }
+        )
+    }
 
     //Stars
     if(totalStars >= 10000){

@@ -283,9 +283,17 @@ async function renderRepoCards(repos) {
     ).join(''); // Use the pre-fetched languagesBar
 }
 
-function renderOrgsCards(orgs) {
+function renderOrgsCards(organizations) {
     const container = document.getElementById('org-cards');
+    const Title = document.getElementById('org-main');
+
     if (!container) return;
+
+    if(organizations.length <= 0){
+        Title.remove();
+    }
+
+    orgs = [...organizations].slice(0,6);
 
     // Reset opacity before rendering new cards
     container.classList.remove('loading-fade');
