@@ -19,7 +19,7 @@ function getBadges(userData, reposData, orgsData){
                 icon: '&#129733',
                 text: 'Collab King',
                 info: "Contribute to 12 or more organizations.",
-                tooltip: "All hail the collab monarch ? your crown shines bright",
+                tooltip: "All hail the collab monarch - your crown shines bright",
                 unicorn: true
             }
         )
